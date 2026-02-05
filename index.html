@@ -4,37 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LEMATEC | Tool Selection Advisor</title>
-    <!-- Tailwind CSS Play CDN -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React & Babel CDNs -->
+    <!-- React & Babel -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; }
+        .animate-fadeIn { animation: fadeIn 0.4s ease-out forwards; }
+        .animate-slideUp { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useMemo, useEffect } = React;
-        // 從 Lucide 全域物件導入圖示
-        const { 
-            Shield, Settings, Maximize, AlertTriangle, CheckCircle2, 
-            RefreshCcw, ChevronRight, Info, Mail, Globe, 
-            ShoppingCart, Users, BookOpen, Quote, Star, 
-            Wrench, Trophy, Smartphone, Cpu, ArrowRight, Youtube
-        } = lucide;
+        const { useState, useMemo } = React;
+
+        // 自定義 SVG 圖示元件 (取代不穩定的 Lucide CDN)
+        const Icon = ({ name, className = "w-6 h-6" }) => {
+            const icons = {
+                shield: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+                settings: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>,
+                maximize: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>,
+                alert: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>,
+                check: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>,
+                refresh: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>,
+                chevron: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M9 5l7 7-7 7"/></svg>,
+                info: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>,
+                mail: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>,
+                globe: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>,
+                cart: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>,
+                users: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>,
+                book: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>,
+                wrench: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>,
+                star: <svg className={className} fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>,
+                quote: <svg className={className} fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21L14.017 18C14.017 16.899 14.917 16 16.017 16H19.017C19.568 16 20.017 15.551 20.017 15V9C20.017 8.449 19.568 8 19.017 8H15.017C14.466 8 14.017 8.449 14.017 9V15H11.017V9C11.017 6.239 13.256 4 16.017 4H19.017C21.778 4 24.017 6.239 24.017 9V15C24.017 18.314 21.331 21 18.017 21H14.017ZM0 15V9C0 6.239 2.239 4 5 4H8C10.761 4 13 6.239 13 9V15C13 18.314 10.314 21 7 21H3V18C3 16.899 3.899 16 5 16H8C8.551 16 9 15.551 9 15V9C9 8.449 8.551 8 8 8H4C3.449 8 3 8.449 3 9V15H0Z"/></svg>,
+                cpu: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9zM9 1v3m6-3v3M9 20v3m6-3v3M20 9h3M20 15h3M1 9h3M1 15h3"/></svg>,
+                phone: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+            };
+            return icons[name] || icons.settings;
+        };
 
         const App = () => {
             const [step, setStep] = useState(0);
-            const [selections, setSelections] = useState({
-                condition: '', shape: '', size: '' 
-            });
+            const [selections, setSelections] = useState({ condition: '', shape: '', size: '' });
 
             const colors = { primary: '#bf2026', secondary: '#1a1a1a', accent: '#004a7c' };
 
@@ -43,7 +61,6 @@
             const amazonStoreUrl = "https://www.amazon.com/s?k=lematec";
             const brandStoryUrl = "https://www.lematec-tools.com/brand-story-lematec";
             const appDownloadUrl = "https://apps.apple.com/us/app/le-lematec/id6717578154";
-            const youtubeUrl = "https://www.youtube.com/@lematecprotools";
 
             const steps = [
                 {
@@ -51,9 +68,9 @@
                     title: 'Step 1: Rust Condition',
                     description: 'Assess the severity of rust on the target surface',
                     options: [
-                        { id: 'light', label: 'Light', detail: 'Surface rust or thin oxidation layer', icon: <CheckCircle2 className="w-6 h-6 text-green-500" /> },
-                        { id: 'medium', label: 'Medium', detail: 'Visible scaling or initial pitting', icon: <Shield className="w-6 h-6 text-yellow-500" /> },
-                        { id: 'heavy', label: 'Heavy', detail: 'Deep flaking and thick rust crusts', icon: <AlertTriangle className="w-6 h-6 text-red-500" /> }
+                        { id: 'light', label: 'Light', detail: 'Surface rust or thin oxidation layer', icon: <Icon name="check" className="w-6 h-6 text-green-500" /> },
+                        { id: 'medium', label: 'Medium', detail: 'Visible scaling or initial pitting', icon: <Icon name="shield" className="w-6 h-6 text-yellow-500" /> },
+                        { id: 'heavy', label: 'Heavy', detail: 'Deep flaking and thick rust crusts', icon: <Icon name="alert" className="w-6 h-6 text-red-500" /> }
                     ]
                 },
                 {
@@ -61,8 +78,8 @@
                     title: 'Step 2: Object Shape',
                     description: 'Determines the optimal tool contact method',
                     options: [
-                        { id: 'flat', label: 'Flat Surface', detail: 'Steel plates, tables, or flat sheets', icon: <Maximize className="w-6 h-6 text-blue-500" /> },
-                        { id: 'non_flat', label: 'Complex Shape', detail: 'Pipes, welds, joints, or castings', icon: <Settings className="w-6 h-6 text-purple-500" /> }
+                        { id: 'flat', label: 'Flat Surface', detail: 'Steel plates, tables, or flat sheets', icon: <Icon name="maximize" className="w-6 h-6 text-blue-500" /> },
+                        { id: 'non_flat', label: 'Complex Shape', detail: 'Pipes, welds, joints, or castings', icon: <Icon name="settings" className="w-6 h-6 text-purple-500" /> }
                     ]
                 },
                 {
@@ -70,9 +87,9 @@
                     title: 'Step 3: Object Size',
                     description: 'Consider workflow efficiency and portability',
                     options: [
-                        { id: 'small', label: 'Small', detail: 'Hand-sized: Screws, small brackets', icon: <div className="text-xs font-bold px-2 py-1 border-2 rounded border-gray-300 uppercase">Handheld</div> },
-                        { id: 'medium', label: 'Medium', detail: 'Auto parts, frames, or wheels', icon: <div className="text-xs font-bold px-2 py-1 border-2 rounded border-gray-300 uppercase">Medium</div> },
-                        { id: 'large', label: 'Large', detail: 'Hull sections, or heavy machinery', icon: <div className="text-xs font-bold px-2 py-1 border-2 rounded border-gray-300 uppercase">Heavy Duty</div> }
+                        { id: 'small', label: 'Small', detail: 'Hand-sized: Screws, small brackets', icon: <div className="text-[10px] font-bold px-2 py-1 border-2 rounded border-gray-300 uppercase">Handheld</div> },
+                        { id: 'medium', label: 'Medium', detail: 'Auto parts, frames, or wheels', icon: <div className="text-[10px] font-bold px-2 py-1 border-2 rounded border-gray-300 uppercase">Medium</div> },
+                        { id: 'large', label: 'Large', detail: 'Hull sections, or heavy machinery', icon: <div className="text-[10px] font-bold px-2 py-1 border-2 rounded border-gray-300 uppercase">Heavy Duty</div> }
                     ]
                 }
             ];
@@ -81,6 +98,12 @@
                 setSelections(prev => ({ ...prev, [id]: value }));
                 if (step < steps.length - 1) { setStep(step + 1); } else { setStep(3); }
             };
+
+            const mailtoLink = useMemo(() => {
+                const subject = encodeURIComponent("Technical Inquiry: LEMATEC Air Tools");
+                const body = encodeURIComponent(`Hi LEMATEC,\n\nI need advice for:\n- Condition: ${selections.condition}\n- Shape: ${selections.shape}\n- Size: ${selections.size}\n\nPlease provide a solution.`);
+                return `mailto:sales@lematec.co?subject=${subject}&body=${body}`;
+            }, [selections]);
 
             const getRecommendation = useMemo(() => {
                 const { condition, shape, size } = selections;
@@ -113,13 +136,6 @@
                 }
                 return { tool, reason, advice };
             }, [selections, step]);
-
-            // 定義電子郵件連結邏輯
-            const mailtoLink = useMemo(() => {
-                const subject = encodeURIComponent("Technical Inquiry: LEMATEC Air Tools");
-                const body = encodeURIComponent(`Hi LEMATEC,\n\nI need advice for:\n- Condition: ${selections.condition}\n- Shape: ${selections.shape}\n- Size: ${selections.size}\n\nPlease provide a solution.`);
-                return `mailto:sales@lematec.co?subject=${subject}&body=${body}`;
-            }, [selections]);
 
             const reset = () => {
                 setStep(0);
@@ -154,7 +170,7 @@
                         </div>
                         <div className="p-10">
                         {step < 3 ? (
-                            <div className="text-left">
+                            <div className="animate-fadeIn text-left">
                             <div className="mb-10">
                                 <span className="text-red-600 font-mono font-black text-xs uppercase tracking-widest block mb-1">Step {step + 1} of 3</span>
                                 <h2 className="text-3xl font-black text-slate-800 uppercase tracking-tight leading-none">{steps[step].title}</h2>
@@ -168,15 +184,15 @@
                                     <div className="font-black text-slate-800 text-xl uppercase tracking-tighter leading-none mb-1">{option.label}</div>
                                     <div className="text-slate-400 text-sm font-medium">{option.detail}</div>
                                     </div>
-                                    <ChevronRight className="text-slate-200 group-hover:text-red-500 group-hover:translate-x-2 transition-all" />
+                                    <Icon name="chevron" className="w-5 h-5 text-slate-200 group-hover:text-red-500 group-hover:translate-x-2 transition-all" />
                                 </button>
                                 ))}
                             </div>
                             </div>
                         ) : (
-                            <div className="text-left">
+                            <div className="animate-slideUp text-left">
                             <div className="text-center mb-12">
-                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 text-xs font-black uppercase tracking-widest mb-6 shadow-sm shadow-green-100"><CheckCircle2 size={14} /> Recommended Solution</div>
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 text-xs font-black uppercase tracking-widest mb-6 shadow-sm shadow-green-100"><Icon name="check" className="w-4 h-4" /> Recommended Solution</div>
                                 <h2 className="text-4xl font-black text-slate-900 uppercase tracking-tighter mb-10">Matching Result</h2>
                                 <div className="p-10 rounded-[2.5rem] border-4 border-slate-900 bg-white shadow-xl relative overflow-hidden group text-center">
                                 <span className="text-red-600 font-black text-xs tracking-[0.3em] uppercase mb-4 block">Recommended Tool</span>
@@ -185,11 +201,11 @@
                             </div>
                             <div className="space-y-10">
                                 <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-200 shadow-inner">
-                                <h3 className="text-xl font-black text-slate-900 flex items-center gap-3 mb-4 uppercase tracking-tight"><Info className="text-red-600" size={24} /> Application Logic</h3>
+                                <h3 className="text-xl font-black text-slate-900 flex items-center gap-3 mb-4 uppercase tracking-tight"><Icon name="info" className="w-6 h-6 text-red-600" /> Application Logic</h3>
                                 <p className="text-slate-600 italic text-xl leading-relaxed font-medium">"{getRecommendation.reason}"</p>
                                 </div>
                                 <div>
-                                <h3 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-3 uppercase tracking-tight"><Settings className="text-slate-400" size={24} /> Technical Guidelines</h3>
+                                <h3 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-3 uppercase tracking-tight"><Icon name="settings" className="w-6 h-6 text-slate-400" /> Technical Guidelines</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {getRecommendation.advice.map((item, idx) => (
                                     <div key={idx} className="flex items-center gap-5 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:border-red-200 transition-colors">
@@ -200,9 +216,9 @@
                                 </div>
                                 </div>
                                 <div className="pt-10 border-t border-slate-100 flex flex-col md:flex-row gap-5">
-                                <button onClick={reset} className="flex-1 flex items-center justify-center gap-3 py-5 bg-slate-100 text-slate-700 rounded-2xl font-black uppercase tracking-widest hover:bg-slate-200 transition-all border-b-4 border-slate-300 active:border-b-0 active:translate-y-1"><RefreshCcw size={18} /> Restart Expert</button>
+                                <button onClick={reset} className="flex-1 flex items-center justify-center gap-3 py-5 bg-slate-100 text-slate-700 rounded-2xl font-black uppercase tracking-widest hover:bg-slate-200 transition-all border-b-4 border-slate-300 active:border-b-0 active:translate-y-1"><Icon name="refresh" className="w-5 h-5" /> Restart Expert</button>
                                 <a href={shopUrl} target="_blank" className="flex-1 flex flex-col items-center justify-center gap-1 py-5 bg-red-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-red-700 transition-all shadow-lg shadow-red-200 no-underline border-b-4 border-red-800 active:border-b-0 active:translate-y-1">
-                                    <span className="flex items-center gap-3 text-center">View on Amazon <ShoppingCart size={20} /></span>
+                                    <span className="flex items-center gap-3 text-center">View on Amazon <Icon name="cart" className="w-5 h-5" /></span>
                                     <span className="text-[10px] font-bold opacity-70 uppercase">Purchase Now</span>
                                 </a>
                                 </div>
@@ -214,42 +230,42 @@
 
                     <div className="max-w-4xl w-full mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
                         <a href={officialUrl} target="_blank" className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col items-center text-center group hover:border-red-500 transition-all no-underline">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all group-hover:scale-110 bg-slate-50 text-slate-600 group-hover:text-red-600"><Globe size={20} /></div>
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all group-hover:scale-110 bg-slate-50 text-slate-600 group-hover:text-red-600"><Icon name="globe" /></div>
                         <h4 className="font-black text-slate-800 text-[10px] uppercase tracking-tighter leading-none">Official Web</h4>
                         </a>
                         <a href={mailtoLink} className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col items-center text-center group hover:border-red-500 transition-all no-underline">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all group-hover:scale-110 bg-red-600 text-white shadow-red-100 shadow-lg"><Mail size={20} /></div>
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all group-hover:scale-110 bg-red-600 text-white shadow-red-100 shadow-lg"><Icon name="mail" /></div>
                         <h4 className="font-black text-slate-800 text-[10px] uppercase tracking-tighter leading-none">Tech Support</h4>
                         </a>
                         <a href={amazonStoreUrl} target="_blank" className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col items-center text-center group hover:border-red-500 transition-all no-underline">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all group-hover:scale-110 bg-slate-50 text-slate-600 group-hover:text-red-600"><ShoppingCart size={20} /></div>
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all group-hover:scale-110 bg-slate-50 text-slate-600 group-hover:text-red-600"><Icon name="cart" /></div>
                         <h4 className="font-black text-slate-800 text-[10px] uppercase tracking-tighter leading-none">Amazon Store</h4>
                         </a>
                         <a href={brandStoryUrl} target="_blank" className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col items-center text-center group hover:border-red-500 transition-all no-underline">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all group-hover:scale-110 bg-slate-50 text-slate-600 group-hover:text-red-600"><BookOpen size={20} /></div>
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all group-hover:scale-110 bg-slate-50 text-slate-600 group-hover:text-red-600"><Icon name="book" /></div>
                         <h4 className="font-black text-slate-800 text-[10px] uppercase tracking-tighter leading-none">Our Story</h4>
                         </a>
                     </div>
 
                     <div className="max-w-4xl w-full mt-16 bg-[#1a1a1a] rounded-[3rem] p-10 text-white relative overflow-hidden shadow-2xl group">
-                        <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:opacity-20 transition-opacity"><Smartphone size={180}/></div>
+                        <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:opacity-20 transition-opacity"><Icon name="smartphone" className="w-40 h-40" /></div>
                         <div className="relative z-10 flex flex-col md:flex-row gap-10 items-center justify-between">
                         <div className="text-left flex-1">
-                            <div className="inline-flex items-center gap-2 text-blue-400 font-black text-xs uppercase tracking-[0.3em] mb-4"><Cpu size={14}/> Digital Tool Management</div>
+                            <div className="inline-flex items-center gap-2 text-blue-400 font-black text-xs uppercase tracking-[0.3em] mb-4"><Icon name="cpu" className="w-4 h-4" /> Digital Tool Management</div>
                             <h3 className="text-4xl font-black uppercase tracking-tighter mb-4 leading-none text-white">LEMATEC Smart App</h3>
                             <p className="text-slate-400 text-lg mb-8 leading-relaxed max-w-xl">Digitalize your workshop. Track tool maintenance history, access technical manuals instantly, and optimize your surface treatment workflow from your iPhone.</p>
                             <div className="flex flex-wrap gap-4 items-center">
-                                <a href={appDownloadUrl} target="_blank" className="inline-flex items-center gap-4 px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl">App Store <Smartphone size={20} /></a>
-                                <a href="https://www.lematec-tools.com/lematec-app-digital-tool-management" target="_blank" className="inline-flex items-center gap-2 text-white font-bold hover:text-blue-400 transition-colors py-2 px-4">Learn More <ArrowRight size={16}/></a>
+                                <a href={appDownloadUrl} target="_blank" className="inline-flex items-center gap-4 px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl">App Store <Icon name="smartphone" className="w-5 h-5" /></a>
+                                <a href="https://www.lematec-tools.com/lematec-app-digital-tool-management" target="_blank" className="inline-flex items-center gap-2 text-white font-bold hover:text-blue-400 transition-colors py-2 px-4">Learn More <Icon name="chevron" className="w-4 h-4" /></a>
                             </div>
                         </div>
                         </div>
                     </div>
 
                     <div className="max-w-4xl w-full mt-12 bg-white rounded-[3rem] p-12 shadow-xl border border-slate-100 text-left relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-10 opacity-[0.02]"><Quote size={240} /></div>
+                        <div className="absolute top-0 right-0 p-10 opacity-[0.02]"><Icon name="quote" className="w-60 h-60" /></div>
                         <div className="flex items-center gap-6 mb-12 relative z-10">
-                        <div className="p-3 bg-slate-900 rounded-xl text-white"><Wrench size={24} /></div>
+                        <div className="p-3 bg-slate-900 rounded-xl text-white"><Icon name="wrench" /></div>
                         <div className="h-10 w-px bg-slate-200"></div>
                         <h3 className="text-2xl font-black text-slate-800 uppercase tracking-tighter">Lematec Heritage</h3>
                         </div>
@@ -257,30 +273,30 @@
                         <div className="lg:col-span-3">
                             <p className="text-slate-500 text-lg leading-relaxed mb-8 font-medium">For over three decades, LEMATEC has defined excellence in air tool engineering. Based in Taiwan, we manufacture high-performance solutions designed to withstand the toughest industrial environments.</p>
                             <div className="relative p-8 bg-slate-50 rounded-[2rem] border border-slate-100 shadow-inner">
-                            <Quote className="text-red-600/20 absolute top-4 left-4" size={48} />
-                            <p className="text-slate-800 text-2xl font-black italic leading-tight relative z-10 tracking-tight">"KEEP PUSHING FORWARD; <br/>BETTER BEATS BEST."</p>
+                            <Icon name="quote" className="text-red-600/10 absolute top-4 left-4 w-12 h-12" />
+                            <p className="text-slate-800 text-2xl font-black italic leading-tight relative z-10 tracking-tight uppercase">"KEEP PUSHING FORWARD; <br/>BETTER BEATS BEST."</p>
                             </div>
                         </div>
                         <div className="lg:col-span-2">
                             <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-xl relative">
-                            <div className="flex items-center gap-3 text-red-500 mb-8"><Users size={20} /> <span className="text-[10px] font-black uppercase tracking-[0.2em]">Leadership</span></div>
+                            <div className="flex items-center gap-3 text-red-500 mb-8"><Icon name="users" className="w-5 h-5" /> <span className="text-[10px] font-black uppercase tracking-[0.2em]">Leadership</span></div>
                             <div className="relative z-10 text-left">
                                 <h4 className="text-xl font-black uppercase leading-tight mb-2">Global Vision, <br/>Taiwan Craft</h4>
-                                <p className="text-slate-400 text-xs font-bold mb-10">Steering Success; Shaping Solutions.</p>
+                                <p className="text-slate-400 text-xs font-bold mb-10 uppercase">Steering Success; Shaping Solutions.</p>
                                 <div className="space-y-8 border-t border-slate-800 pt-8">
                                 <div className="flex flex-col">
-                                    <span className="text-base font-black italic text-red-500 flex items-center gap-2 uppercase tracking-tight">VIC CHEN <Star size={14} fill="currentColor" /></span>
+                                    <span className="text-base font-black italic text-red-500 flex items-center gap-2 uppercase tracking-tight">VIC CHEN <Icon name="star" className="w-3 h-3" /></span>
                                     <span className="text-[10px] uppercase text-slate-200 font-black tracking-widest mt-1">General Manager, Taiwan</span>
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-base font-black italic text-red-500 flex items-center gap-2 uppercase tracking-tight">Charles Rosenstein <Star size={14} fill="currentColor" /></span>
-                                    <span className="text-[10px] uppercase text-slate-200 font-black tracking-widest mt-1 leading-normal">CEO, Ubiquitous Company <br/><span className="text-slate-400 italic">(Brand Partner)</span></span>
+                                    <span className="text-base font-black italic text-red-500 flex items-center gap-2 uppercase tracking-tight">Charles Rosenstein <Icon name="star" className="w-3 h-3" /></span>
+                                    <span className="text-[10px] uppercase text-slate-200 font-black tracking-widest mt-1 leading-normal uppercase">CEO, Ubiquitous Company <br/><span className="text-slate-400 italic font-medium">(Brand Partner)</span></span>
                                 </div>
                                 </div>
                             </div>
                             </div>
                             <a href={brandStoryUrl} target="_blank" className="mt-6 flex items-center justify-between w-full p-6 bg-white border-2 border-slate-900 rounded-[2rem] font-black text-slate-900 hover:bg-slate-900 hover:text-white transition-all group no-underline uppercase tracking-tighter">
-                            <span>Our Full Story</span><ChevronRight className="group-hover:translate-x-2 transition-transform" />
+                            <span>Our Full Story</span><Icon name="chevron" className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
                             </a>
                         </div>
                         </div>
