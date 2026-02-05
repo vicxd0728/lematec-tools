@@ -1,420 +1,297 @@
-import React, { useState, useMemo } from 'react';
-import { 
-  Shield, 
-  Settings, 
-  Maximize, 
-  AlertTriangle, 
-  CheckCircle2, 
-  RefreshCcw, 
-  ChevronRight, 
-  Info, 
-  Mail, 
-  Globe, 
-  ShoppingCart,
-  Users,
-  BookOpen,
-  Quote,
-  Star,
-  Wrench,
-  Trophy,
-  Smartphone,
-  Cpu,
-  ArrowRight
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEMATEC | Tool Selection Advisor</title>
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & Babel CDNs -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
 
-const App = () = {
-  const [step, setStep] = useState(0);
-  const [selections, setSelections] = useState({
-    condition '', 
-    shape '', 
-    size '' 
-  });
+    <script type="text/babel">
+        const { useState, useMemo, useEffect } = React;
+        // 從 Lucide 全域物件導入圖示
+        const { 
+            Shield, Settings, Maximize, AlertTriangle, CheckCircle2, 
+            RefreshCcw, ChevronRight, Info, Mail, Globe, 
+            ShoppingCart, Users, BookOpen, Quote, Star, 
+            Wrench, Trophy, Smartphone, Cpu, ArrowRight, Youtube
+        } = lucide;
 
-   LEMATEC Branding Colors
-  const colors = {
-    primary '#bf2026',  LEMATEC Red
-    secondary '#1a1a1a', 
-    accent '#004a7c',
-    light '#f8f9fa'
-  };
+        const App = () => {
+            const [step, setStep] = useState(0);
+            const [selections, setSelections] = useState({
+                condition: '', shape: '', size: '' 
+            });
 
-  const officialUrl = httpswww.lematec-tools.com;
-  const shopUrl = httpswww.amazon.comLEMATEC-Gravity-Feed-Sandblaster-AS118dpB01M0CRUUM;
-  const amazonStoreUrl = httpswww.amazon.comsk=lematec;
-  const brandStoryUrl = httpswww.lematec-tools.combrand-story-lematec;
-  const appDownloadUrl = httpsapps.apple.comusapple-lematecid6717578154;
-  const youtubeUrl = httpswww.youtube.com@lematecprotools;
+            const colors = { primary: '#bf2026', secondary: '#1a1a1a', accent: '#004a7c' };
 
-  const steps = [
-    {
-      id 'condition',
-      title 'Step 1 Rust Condition',
-      description 'Assess the severity of rust on the target surface',
-      options [
-        { id 'light', label 'Light', detail 'Surface rust or thin oxidation layer', icon CheckCircle2 className=w-6 h-6 text-green-500  },
-        { id 'medium', label 'Medium', detail 'Visible scaling or initial pitting', icon Shield className=w-6 h-6 text-yellow-500  },
-        { id 'heavy', label 'Heavy', detail 'Deep flaking and thick rust crusts', icon AlertTriangle className=w-6 h-6 text-red-500  }
-      ]
-    },
-    {
-      id 'shape',
-      title 'Step 2 Object Shape',
-      description 'Determines the optimal tool contact method',
-      options [
-        { id 'flat', label 'Flat Surface', detail 'Steel plates, tables, or flat sheets', icon Maximize className=w-6 h-6 text-blue-500  },
-        { id 'non_flat', label 'Complex Shape', detail 'Pipes, welds, joints, or castings', icon Settings className=w-6 h-6 text-purple-500  }
-      ]
-    },
-    {
-      id 'size',
-      title 'Step 3 Object Size',
-      description 'Consider workflow efficiency and portability',
-      options [
-        { id 'small', label 'Small', detail 'Hand-sized Screws, small brackets', icon div className=text-xs font-bold px-2 py-1 border-2 rounded border-gray-300 uppercaseHandhelddiv },
-        { id 'medium', label 'Medium', detail 'Auto parts, frames, or wheels', icon div className=text-xs font-bold px-2 py-1 border-2 rounded border-gray-300 uppercaseMediumdiv },
-        { id 'large', label 'Large', detail 'Hull sections, or heavy machinery', icon div className=text-xs font-bold px-2 py-1 border-2 rounded border-gray-300 uppercaseHeavy Dutydiv }
-      ]
-    }
-  ];
+            const officialUrl = "https://www.lematec-tools.com/";
+            const shopUrl = "https://www.amazon.com/LEMATEC-Gravity-Feed-Sandblaster-AS118/dp/B01M0CRUUM/";
+            const amazonStoreUrl = "https://www.amazon.com/s?k=lematec";
+            const brandStoryUrl = "https://www.lematec-tools.com/brand-story-lematec";
+            const appDownloadUrl = "https://apps.apple.com/us/app/le-lematec/id6717578154";
+            const youtubeUrl = "https://www.youtube.com/@lematecprotools";
 
-  const handleSelect = (id, value) = {
-    setSelections(prev = ({ ...prev, [id] value }));
-    if (step  steps.length - 1) {
-      setStep(step + 1);
-    } else {
-      setStep(3); 
-    }
-  };
+            const steps = [
+                {
+                    id: 'condition',
+                    title: 'Step 1: Rust Condition',
+                    description: 'Assess the severity of rust on the target surface',
+                    options: [
+                        { id: 'light', label: 'Light', detail: 'Surface rust or thin oxidation layer', icon: <CheckCircle2 className="w-6 h-6 text-green-500" /> },
+                        { id: 'medium', label: 'Medium', detail: 'Visible scaling or initial pitting', icon: <Shield className="w-6 h-6 text-yellow-500" /> },
+                        { id: 'heavy', label: 'Heavy', detail: 'Deep flaking and thick rust crusts', icon: <AlertTriangle className="w-6 h-6 text-red-500" /> }
+                    ]
+                },
+                {
+                    id: 'shape',
+                    title: 'Step 2: Object Shape',
+                    description: 'Determines the optimal tool contact method',
+                    options: [
+                        { id: 'flat', label: 'Flat Surface', detail: 'Steel plates, tables, or flat sheets', icon: <Maximize className="w-6 h-6 text-blue-500" /> },
+                        { id: 'non_flat', label: 'Complex Shape', detail: 'Pipes, welds, joints, or castings', icon: <Settings className="w-6 h-6 text-purple-500" /> }
+                    ]
+                },
+                {
+                    id: 'size',
+                    title: 'Step 3: Object Size',
+                    description: 'Consider workflow efficiency and portability',
+                    options: [
+                        { id: 'small', label: 'Small', detail: 'Hand-sized: Screws, small brackets', icon: <div className="text-xs font-bold px-2 py-1 border-2 rounded border-gray-300 uppercase">Handheld</div> },
+                        { id: 'medium', label: 'Medium', detail: 'Auto parts, frames, or wheels', icon: <div className="text-xs font-bold px-2 py-1 border-2 rounded border-gray-300 uppercase">Medium</div> },
+                        { id: 'large', label: 'Large', detail: 'Hull sections, or heavy machinery', icon: <div className="text-xs font-bold px-2 py-1 border-2 rounded border-gray-300 uppercase">Heavy Duty</div> }
+                    ]
+                }
+            ];
 
-  const getRecommendation = useMemo(() = {
-    const { condition, shape, size } = selections;
-    if (step  3) return null;
+            const handleSelect = (id, value) => {
+                setSelections(prev => ({ ...prev, [id]: value }));
+                if (step < steps.length - 1) { setStep(step + 1); } else { setStep(3); }
+            };
 
-    let tool = ;
-    let reason = ;
-    let advice = [];
+            const getRecommendation = useMemo(() => {
+                const { condition, shape, size } = selections;
+                if (step < 3) return null;
+                let tool = ""; let reason = ""; let advice = [];
+                if (shape === 'flat') {
+                    if (condition === 'heavy') {
+                        tool = "LE-NS Needle Scaler + Grinder Combo";
+                        reason = "For heavy rust on flat surfaces, we recommend using a needle scaler to break crusts, followed by a grinder for finishing.";
+                        advice = ["Use hardened steel needles for scale", "Follow up with 60-80 grit sanding discs"];
+                    } else {
+                        tool = "LE-AS Random Orbital Sander";
+                        reason = "Light surface rust is handled most efficiently with high-speed orbital sanding.";
+                        advice = ["Use non-woven pads for oxidation", "Choose a 6-inch pad for faster coverage"];
+                    }
+                } else {
+                    if (size === 'small' || condition === 'light') {
+                        tool = "LE-AS118 Gravity Feed Sandblaster";
+                        reason = "Sandblasting is the best way to clean intricate crevices and complex small parts.";
+                        advice = ["Operate inside a blasting cabinet", "Adjust air pressure based on material"];
+                    } else if (condition === 'heavy') {
+                        tool = "LE-NS Air Needle Scaler";
+                        reason = "Needles independently adapt to uneven shapes, perfect for welds and irregular castings.";
+                        advice = ["Effective for chassis and heavy frames", "Ensure consistent air flow at 90 PSI"];
+                    } else {
+                        tool = "LE-AS118 Sandblaster or Die Grinder";
+                        reason = "Medium complex parts require the thorough cleaning power of sandblasting.";
+                        advice = ["Blasting reaches deep recesses", "Die grinders handle specific high spots"];
+                    }
+                }
+                return { tool, reason, advice };
+            }, [selections, step]);
 
-    if (shape === 'flat') {
-      if (condition === 'heavy') {
-        tool = LE-NS Needle Scaler + Grinder Combo;
-        reason = For heavy rust on flat surfaces, we recommend using a needle scaler to break crusts, followed by a grinder for finishing.;
-        advice = [Use hardened steel needles for scale, Follow up with 60-80 grit sanding discs];
-      } else {
-        tool = LE-AS Random Orbital Sander;
-        reason = Light surface rust is handled most efficiently with high-speed orbital sanding.;
-        advice = [Use non-woven pads for oxidation, Choose a 6-inch pad for faster coverage];
-      }
-    } else {
-      if (size === 'small'  condition === 'light') {
-        tool = LE-AS118 Gravity Feed Sandblaster;
-        reason = Sandblasting is the best way to clean intricate crevices and complex small parts.;
-        advice = [Operate inside a blasting cabinet, Adjust air pressure based on material];
-      } else if (condition === 'heavy') {
-        tool = LE-NS Air Needle Scaler;
-        reason = Needles independently adapt to uneven shapes, perfect for welds and irregular castings.;
-        advice = [Effective for chassis and heavy frames, Ensure consistent air flow at 90 PSI];
-      } else {
-        tool = LE-AS118 Sandblaster or Die Grinder;
-        reason = Medium complex parts require the thorough cleaning power of sandblasting.;
-        advice = [Blasting reaches deep recesses, Die grinders handle specific high spots];
-      }
-    }
+            // 定義電子郵件連結邏輯
+            const mailtoLink = useMemo(() => {
+                const subject = encodeURIComponent("Technical Inquiry: LEMATEC Air Tools");
+                const body = encodeURIComponent(`Hi LEMATEC,\n\nI need advice for:\n- Condition: ${selections.condition}\n- Shape: ${selections.shape}\n- Size: ${selections.size}\n\nPlease provide a solution.`);
+                return `mailto:sales@lematec.co?subject=${subject}&body=${body}`;
+            }, [selections]);
 
-    return { tool, reason, advice };
-  }, [selections, step]);
+            const reset = () => {
+                setStep(0);
+                setSelections({ condition: '', shape: '', size: '' });
+            };
 
-  const mailtoLink = useMemo(() = {
-    const subject = encodeURIComponent(Technical Inquiry LEMATEC Air Tools);
-    const body = encodeURIComponent(`Hi LEMATEC,nnI need advice forn- Condition ${selections.condition}n- Shape ${selections.shape}n- Size ${selections.size}nnPlease provide a solution.`);
-    return `mailtosales@lematec.cosubject=${subject}&body=${body}`;
-  }, [selections]);
+            return (
+                <div className="min-h-screen bg-slate-50 flex flex-col items-center py-10 px-4 font-sans text-slate-900">
+                    <div className="max-w-4xl w-full mb-10 flex flex-col items-center">
+                        <div className="flex flex-wrap justify-center items-center gap-6 py-4 px-8 bg-white rounded-2xl shadow-sm border border-slate-200">
+                        <div className="flex flex-col items-center">
+                            <span className="text-3xl font-black italic tracking-tighter leading-none" style={{color: colors.primary}}>LEMATEC</span>
+                            <span className="text-[9px] font-bold tracking-[0.3em] uppercase text-slate-400 mt-1">Professional Air Tools</span>
+                        </div>
+                        <div className="hidden md:block h-8 w-px bg-slate-200"></div>
+                        <span className="text-[10px] font-bold tracking-widest uppercase text-slate-500">Global Selection Expert</span>
+                        </div>
+                    </div>
 
-  const reset = () = {
-    setStep(0);
-    setSelections({ condition '', shape '', size '' });
-  };
+                    <div className="max-w-2xl w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100">
+                        <div className="bg-[#1a1a1a] p-10 text-white relative text-left">
+                        <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-3 leading-tight uppercase">How to choose tools for rust removal?</h1>
+                        <div className="flex items-center gap-2 text-red-500 font-bold uppercase tracking-widest text-sm mb-6">
+                            <div className="w-8 h-[2px] bg-red-600"></div>
+                            <span>Expert Surface Treatment Guidance</span>
+                        </div>
+                        </div>
+                        <div className="w-full h-1.5 bg-slate-100 flex">
+                        {[0, 1, 2, 3].map((s) => (
+                            <div key={s} className="flex-1 transition-all duration-700 ease-in-out" style={{ backgroundColor: step >= s ? colors.primary : 'transparent' }} />
+                        ))}
+                        </div>
+                        <div className="p-10">
+                        {step < 3 ? (
+                            <div className="text-left">
+                            <div className="mb-10">
+                                <span className="text-red-600 font-mono font-black text-xs uppercase tracking-widest block mb-1">Step {step + 1} of 3</span>
+                                <h2 className="text-3xl font-black text-slate-800 uppercase tracking-tight leading-none">{steps[step].title}</h2>
+                                <p className="text-slate-500 mt-2 text-lg leading-relaxed">{steps[step].description}</p>
+                            </div>
+                            <div className="grid grid-cols-1 gap-5">
+                                {steps[step].options.map((option) => (
+                                <button key={option.id} onClick={() => handleSelect(steps[step].id, option.id)} className="flex items-center p-6 border-2 border-slate-100 rounded-3xl hover:border-red-500 hover:bg-red-50 transition-all text-left group shadow-sm bg-white">
+                                    <div className="bg-slate-50 p-4 rounded-2xl group-hover:bg-white transition-colors border border-transparent group-hover:border-red-100 shadow-inner">{option.icon}</div>
+                                    <div className="ml-6 flex-1">
+                                    <div className="font-black text-slate-800 text-xl uppercase tracking-tighter leading-none mb-1">{option.label}</div>
+                                    <div className="text-slate-400 text-sm font-medium">{option.detail}</div>
+                                    </div>
+                                    <ChevronRight className="text-slate-200 group-hover:text-red-500 group-hover:translate-x-2 transition-all" />
+                                </button>
+                                ))}
+                            </div>
+                            </div>
+                        ) : (
+                            <div className="text-left">
+                            <div className="text-center mb-12">
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 text-xs font-black uppercase tracking-widest mb-6 shadow-sm shadow-green-100"><CheckCircle2 size={14} /> Recommended Solution</div>
+                                <h2 className="text-4xl font-black text-slate-900 uppercase tracking-tighter mb-10">Matching Result</h2>
+                                <div className="p-10 rounded-[2.5rem] border-4 border-slate-900 bg-white shadow-xl relative overflow-hidden group text-center">
+                                <span className="text-red-600 font-black text-xs tracking-[0.3em] uppercase mb-4 block">Recommended Tool</span>
+                                <span className="text-3xl md:text-5xl font-black text-slate-900 break-words leading-none uppercase tracking-tighter">{getRecommendation.tool}</span>
+                                </div>
+                            </div>
+                            <div className="space-y-10">
+                                <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-200 shadow-inner">
+                                <h3 className="text-xl font-black text-slate-900 flex items-center gap-3 mb-4 uppercase tracking-tight"><Info className="text-red-600" size={24} /> Application Logic</h3>
+                                <p className="text-slate-600 italic text-xl leading-relaxed font-medium">"{getRecommendation.reason}"</p>
+                                </div>
+                                <div>
+                                <h3 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-3 uppercase tracking-tight"><Settings className="text-slate-400" size={24} /> Technical Guidelines</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {getRecommendation.advice.map((item, idx) => (
+                                    <div key={idx} className="flex items-center gap-5 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:border-red-200 transition-colors">
+                                        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-900 text-white font-black text-lg shrink-0">{idx + 1}</div>
+                                        <p className="text-slate-700 font-bold text-base leading-tight">{item}</p>
+                                    </div>
+                                    ))}
+                                </div>
+                                </div>
+                                <div className="pt-10 border-t border-slate-100 flex flex-col md:flex-row gap-5">
+                                <button onClick={reset} className="flex-1 flex items-center justify-center gap-3 py-5 bg-slate-100 text-slate-700 rounded-2xl font-black uppercase tracking-widest hover:bg-slate-200 transition-all border-b-4 border-slate-300 active:border-b-0 active:translate-y-1"><RefreshCcw size={18} /> Restart Expert</button>
+                                <a href={shopUrl} target="_blank" className="flex-1 flex flex-col items-center justify-center gap-1 py-5 bg-red-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-red-700 transition-all shadow-lg shadow-red-200 no-underline border-b-4 border-red-800 active:border-b-0 active:translate-y-1">
+                                    <span className="flex items-center gap-3 text-center">View on Amazon <ShoppingCart size={20} /></span>
+                                    <span className="text-[10px] font-bold opacity-70 uppercase">Purchase Now</span>
+                                </a>
+                                </div>
+                            </div>
+                            </div>
+                        )}
+                        </div>
+                    </div>
 
-  return (
-    div className=min-h-screen bg-slate-50 flex flex-col items-center py-10 px-4 font-sans text-slate-900
-      style dangerouslySetInnerHTML={{ __html `
-        @keyframes fadeIn { from { opacity 0; transform translateY(10px); } to { opacity 1; transform translateY(0); } }
-        @keyframes slideUp { from { opacity 0; transform translateY(20px); } to { opacity 1; transform translateY(0); } }
-        .animate-fadeIn { animation fadeIn 0.4s ease-out; }
-        .animate-slideUp { animation slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-      `}} 
-      
-      { Header with Pure Text Logo }
-      div className=max-w-4xl w-full mb-10 flex flex-col items-center
-        div className=flex flex-wrap justify-center items-center gap-6 py-4 px-8 bg-white rounded-2xl shadow-sm border border-slate-200
-          div className=flex flex-col items-center
-             span className=text-3xl font-black italic tracking-tighter leading-none style={{color colors.primary}}
-               LEMATEC
-             span
-             span className=text-[9px] font-bold tracking-[0.3em] uppercase text-slate-400 mt-1Professional Air Toolsspan
-          div
-          div className=hidden mdblock h-8 w-px bg-slate-200div
-          span className=text-[10px] font-bold tracking-widest uppercase text-slate-500Global Selection Expertspan
-        div
-      div
+                    <div className="max-w-4xl w-full mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <a href={officialUrl} target="_blank" className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col items-center text-center group hover:border-red-500 transition-all no-underline">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all group-hover:scale-110 bg-slate-50 text-slate-600 group-hover:text-red-600"><Globe size={20} /></div>
+                        <h4 className="font-black text-slate-800 text-[10px] uppercase tracking-tighter leading-none">Official Web</h4>
+                        </a>
+                        <a href={mailtoLink} className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col items-center text-center group hover:border-red-500 transition-all no-underline">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all group-hover:scale-110 bg-red-600 text-white shadow-red-100 shadow-lg"><Mail size={20} /></div>
+                        <h4 className="font-black text-slate-800 text-[10px] uppercase tracking-tighter leading-none">Tech Support</h4>
+                        </a>
+                        <a href={amazonStoreUrl} target="_blank" className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col items-center text-center group hover:border-red-500 transition-all no-underline">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all group-hover:scale-110 bg-slate-50 text-slate-600 group-hover:text-red-600"><ShoppingCart size={20} /></div>
+                        <h4 className="font-black text-slate-800 text-[10px] uppercase tracking-tighter leading-none">Amazon Store</h4>
+                        </a>
+                        <a href={brandStoryUrl} target="_blank" className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col items-center text-center group hover:border-red-500 transition-all no-underline">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all group-hover:scale-110 bg-slate-50 text-slate-600 group-hover:text-red-600"><BookOpen size={20} /></div>
+                        <h4 className="font-black text-slate-800 text-[10px] uppercase tracking-tighter leading-none">Our Story</h4>
+                        </a>
+                    </div>
 
-      div className=max-w-2xl w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100
-        { Title Area }
-        div className=bg-[#1a1a1a] p-10 text-white relative text-left
-          div className=absolute top-0 right-0 p-6 opacity-5
-            Settings size={160} 
-          div
-          h1 className=text-3xl mdtext-4xl font-black tracking-tight mb-3 leading-tight uppercase
-            How to choose tools for rust removal
-          h1
-          div className=flex items-center gap-2 text-red-500 font-bold uppercase tracking-widest text-sm mb-6
-            div className=w-8 h-[2px] bg-red-600div
-            spanExpert Surface Treatment Guidancespan
-          div
-        div
+                    <div className="max-w-4xl w-full mt-16 bg-[#1a1a1a] rounded-[3rem] p-10 text-white relative overflow-hidden shadow-2xl group">
+                        <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:opacity-20 transition-opacity"><Smartphone size={180}/></div>
+                        <div className="relative z-10 flex flex-col md:flex-row gap-10 items-center justify-between">
+                        <div className="text-left flex-1">
+                            <div className="inline-flex items-center gap-2 text-blue-400 font-black text-xs uppercase tracking-[0.3em] mb-4"><Cpu size={14}/> Digital Tool Management</div>
+                            <h3 className="text-4xl font-black uppercase tracking-tighter mb-4 leading-none text-white">LEMATEC Smart App</h3>
+                            <p className="text-slate-400 text-lg mb-8 leading-relaxed max-w-xl">Digitalize your workshop. Track tool maintenance history, access technical manuals instantly, and optimize your surface treatment workflow from your iPhone.</p>
+                            <div className="flex flex-wrap gap-4 items-center">
+                                <a href={appDownloadUrl} target="_blank" className="inline-flex items-center gap-4 px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl">App Store <Smartphone size={20} /></a>
+                                <a href="https://www.lematec-tools.com/lematec-app-digital-tool-management" target="_blank" className="inline-flex items-center gap-2 text-white font-bold hover:text-blue-400 transition-colors py-2 px-4">Learn More <ArrowRight size={16}/></a>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
 
-        { Progress Tracker }
-        div className=w-full h-1.5 bg-slate-100 flex
-          {[0, 1, 2, 3].map((s) = (
-            div key={s} className=flex-1 transition-all duration-700 ease-in-out style={{ backgroundColor step = s  colors.primary  'transparent' }} 
-          ))}
-        div
+                    <div className="max-w-4xl w-full mt-12 bg-white rounded-[3rem] p-12 shadow-xl border border-slate-100 text-left relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-10 opacity-[0.02]"><Quote size={240} /></div>
+                        <div className="flex items-center gap-6 mb-12 relative z-10">
+                        <div className="p-3 bg-slate-900 rounded-xl text-white"><Wrench size={24} /></div>
+                        <div className="h-10 w-px bg-slate-200"></div>
+                        <h3 className="text-2xl font-black text-slate-800 uppercase tracking-tighter">Lematec Heritage</h3>
+                        </div>
+                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start relative z-10">
+                        <div className="lg:col-span-3">
+                            <p className="text-slate-500 text-lg leading-relaxed mb-8 font-medium">For over three decades, LEMATEC has defined excellence in air tool engineering. Based in Taiwan, we manufacture high-performance solutions designed to withstand the toughest industrial environments.</p>
+                            <div className="relative p-8 bg-slate-50 rounded-[2rem] border border-slate-100 shadow-inner">
+                            <Quote className="text-red-600/20 absolute top-4 left-4" size={48} />
+                            <p className="text-slate-800 text-2xl font-black italic leading-tight relative z-10 tracking-tight">"KEEP PUSHING FORWARD; <br/>BETTER BEATS BEST."</p>
+                            </div>
+                        </div>
+                        <div className="lg:col-span-2">
+                            <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-xl relative">
+                            <div className="flex items-center gap-3 text-red-500 mb-8"><Users size={20} /> <span className="text-[10px] font-black uppercase tracking-[0.2em]">Leadership</span></div>
+                            <div className="relative z-10 text-left">
+                                <h4 className="text-xl font-black uppercase leading-tight mb-2">Global Vision, <br/>Taiwan Craft</h4>
+                                <p className="text-slate-400 text-xs font-bold mb-10">Steering Success; Shaping Solutions.</p>
+                                <div className="space-y-8 border-t border-slate-800 pt-8">
+                                <div className="flex flex-col">
+                                    <span className="text-base font-black italic text-red-500 flex items-center gap-2 uppercase tracking-tight">VIC CHEN <Star size={14} fill="currentColor" /></span>
+                                    <span className="text-[10px] uppercase text-slate-200 font-black tracking-widest mt-1">General Manager, Taiwan</span>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-base font-black italic text-red-500 flex items-center gap-2 uppercase tracking-tight">Charles Rosenstein <Star size={14} fill="currentColor" /></span>
+                                    <span className="text-[10px] uppercase text-slate-200 font-black tracking-widest mt-1 leading-normal">CEO, Ubiquitous Company <br/><span className="text-slate-400 italic">(Brand Partner)</span></span>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+                            <a href={brandStoryUrl} target="_blank" className="mt-6 flex items-center justify-between w-full p-6 bg-white border-2 border-slate-900 rounded-[2rem] font-black text-slate-900 hover:bg-slate-900 hover:text-white transition-all group no-underline uppercase tracking-tighter">
+                            <span>Our Full Story</span><ChevronRight className="group-hover:translate-x-2 transition-transform" />
+                            </a>
+                        </div>
+                        </div>
+                    </div>
+                    <div className="mt-20 mb-10 text-slate-400 text-[10px] text-center font-black uppercase tracking-[0.3em] leading-relaxed">© 2026 LEMATEC Co., Ltd. <br/> Quality Engineered in Taiwan | Professional Air Tools Expert</div>
+                </div>
+            );
+        };
 
-        { Wizard Content }
-        div className=p-10
-          {step  3  (
-            div className=animate-fadeIn text-left
-              div className=mb-10
-                span className=text-red-600 font-mono font-black text-xs uppercase tracking-widest block mb-1Step {step + 1} of 3span
-                h2 className=text-3xl font-black text-slate-800 uppercase tracking-tight leading-none{steps[step].title}h2
-                p className=text-slate-500 mt-2 text-lg leading-relaxed{steps[step].description}p
-              div
-
-              div className=grid grid-cols-1 gap-5
-                {steps[step].options.map((option) = (
-                  button 
-                    key={option.id} 
-                    onClick={() = handleSelect(steps[step].id, option.id)} 
-                    className=flex items-center p-6 border-2 border-slate-100 rounded-3xl hoverborder-red-500 hoverbg-red-50 transition-all text-left group shadow-sm bg-white
-                  
-                    div className=bg-slate-50 p-4 rounded-2xl group-hoverbg-white transition-colors border border-transparent group-hoverborder-red-100 shadow-inner
-                      {option.icon}
-                    div
-                    div className=ml-6 flex-1
-                      div className=font-black text-slate-800 text-xl uppercase tracking-tighter leading-none mb-1{option.label}div
-                      div className=text-slate-400 text-sm font-medium{option.detail}div
-                    div
-                    ChevronRight className=text-slate-200 group-hovertext-red-500 group-hovertranslate-x-2 transition-all 
-                  button
-                ))}
-              div
-            div
-          )  (
-            div className=animate-slideUp text-left
-              div className=text-center mb-12
-                div className=inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 text-xs font-black uppercase tracking-widest mb-6 shadow-sm shadow-green-100
-                  CheckCircle2 size={14}  Recommended Solution
-                div
-                h2 className=text-4xl font-black text-slate-900 uppercase tracking-tighter mb-10Matching Resulth2
-                
-                div className=p-10 rounded-[2.5rem] border-4 border-slate-900 bg-white shadow-xl relative overflow-hidden group
-                  div className=absolute -right-10 -bottom-10 opacity-[0.03] group-hoverrotate-12 transition-transform duration-700
-                    Trophy size={200} 
-                  div
-                  span className=text-red-600 font-black text-xs tracking-[0.3em] uppercase mb-4 blockRecommended Toolspan
-                  span className=text-3xl mdtext-5xl font-black text-slate-900 break-words leading-none uppercase tracking-tighter
-                    {getRecommendation.tool}
-                  span
-                div
-              div
-
-              div className=space-y-10
-                div className=bg-slate-50 p-8 rounded-[2rem] border border-slate-200 shadow-inner
-                  h3 className=text-xl font-black text-slate-900 flex items-center gap-3 mb-4 uppercase tracking-tight
-                    Info className=text-red-600 size={24}  Application Logic
-                  h3
-                  p className=text-slate-600 italic text-xl leading-relaxed font-medium
-                    {getRecommendation.reason}
-                  p
-                div
-
-                div
-                  h3 className=text-xl font-black text-slate-900 mb-6 flex items-center gap-3 uppercase tracking-tight
-                    Settings className=text-slate-400 size={24}  Technical Guidelines
-                  h3
-                  div className=grid grid-cols-1 mdgrid-cols-2 gap-4
-                    {getRecommendation.advice.map((item, idx) = (
-                      div key={idx} className=flex items-center gap-5 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hoverborder-red-200 transition-colors
-                        div className=w-10 h-10 rounded-full flex items-center justify-center bg-slate-900 text-white font-black text-lg shrink-0
-                          {idx + 1}
-                        div
-                        p className=text-slate-700 font-bold text-base leading-tight{item}p
-                      div
-                    ))}
-                  div
-                div
-
-                div className=pt-10 border-t border-slate-100 flex flex-col mdflex-row gap-5
-                  button 
-                    onClick={reset} 
-                    className=flex-1 flex items-center justify-center gap-3 py-5 bg-slate-100 text-slate-700 rounded-2xl font-black uppercase tracking-widest hoverbg-slate-200 transition-all border-b-4 border-slate-300 activeborder-b-0 activetranslate-y-1
-                  
-                    RefreshCcw size={18}  Restart Expert
-                  button
-                  a 
-                    href={shopUrl} 
-                    target=_blank 
-                    rel=noopener noreferrer 
-                    className=flex-1 flex flex-col items-center justify-center gap-1 py-5 bg-red-600 text-white rounded-2xl font-black uppercase tracking-widest hoverbg-red-700 transition-all shadow-lg shadow-red-200 no-underline border-b-4 border-red-800 activeborder-b-0 activetranslate-y-1
-                  
-                    span className=flex items-center gap-3View on Amazon ShoppingCart size={20} span
-                    span className=text-[10px] font-bold opacity-70 uppercasePurchase Nowspan
-                  a
-                div
-              div
-            div
-          )}
-        div
-      div
-
-      { Quick Links Section }
-      div className=max-w-4xl w-full mt-10 grid grid-cols-2 mdgrid-cols-4 gap-4
-        {[
-          { icon Globe size={20} , label Official Web, url officialUrl },
-          { icon Mail size={20} , label Tech Support, url mailtoLink, special true },
-          { icon ShoppingCart size={20} , label Amazon Store, url amazonStoreUrl },
-          { icon BookOpen size={20} , label Brand Story, url brandStoryUrl }
-        ].map((item, idx) = (
-          a 
-            key={idx} 
-            href={item.url} 
-            target=_blank 
-            rel=noopener noreferrer 
-            className=bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col items-center text-center group hoverborder-red-500 hovershadow-md transition-all no-underline
-          
-            div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all group-hoverscale-110 ${item.special  'bg-red-600 text-white shadow-red-100 shadow-lg'  'bg-slate-50 text-slate-600 group-hovertext-red-600'}`}
-              {item.icon}
-            div
-            h4 className=font-black text-slate-800 text-[10px] uppercase tracking-tighter leading-none{item.label}h4
-          a
-        ))}
-      div
-
-      { Smart App Banner - Redesigned for a cleaner look }
-      div className=max-w-4xl w-full mt-16 bg-[#1a1a1a] rounded-[3rem] p-10 text-white relative overflow-hidden shadow-2xl group
-         div className=absolute top-0 right-0 p-10 opacity-10 group-hoveropacity-20 transition-opacitySmartphone size={180}div
-         div className=relative z-10 flex flex-col mdflex-row gap-10 items-center justify-between
-            div className=text-left flex-1
-               div className=inline-flex items-center gap-2 text-blue-400 font-black text-xs uppercase tracking-[0.3em] mb-4
-                  Cpu size={14} Digital Tool Management
-               div
-               h3 className=text-4xl font-black uppercase tracking-tighter mb-4 leading-none text-whiteLEMATEC Smart Apph3
-               p className=text-slate-400 text-lg mb-8 leading-relaxed max-w-xl
-                  Digitalize your workshop. Track tool maintenance history, access technical manuals instantly, and optimize your surface treatment workflow from your iPhone.
-               p
-               div className=flex flex-wrap gap-4 items-center
-                  a 
-                    href={appDownloadUrl} 
-                    target=_blank 
-                    className=inline-flex items-center gap-4 px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest hoverbg-blue-700 transition-all shadow-xl
-                  
-                     App Store Smartphone size={20} 
-                  a
-                  a 
-                    href=httpswww.lematec-tools.comlematec-app-digital-tool-management 
-                    target=_blank 
-                    className=inline-flex items-center gap-2 text-white font-bold hovertext-blue-400 transition-colors py-2 px-4
-                  
-                     Learn More ArrowRight size={16}
-                  a
-               div
-            div
-            div className=hidden lgflex flex-col gap-3 pr-8
-                div className=px-4 py-2 bg-slate-800 rounded-xl border border-slate-700 flex items-center gap-3
-                   div className=w-2 h-2 rounded-full bg-blue-500 animate-pulsediv
-                   span className=text-xs font-bold uppercase tracking-widest text-slate-300Maintenance Trackingspan
-                div
-                div className=px-4 py-2 bg-slate-800 rounded-xl border border-slate-700 flex items-center gap-3
-                   div className=w-2 h-2 rounded-full bg-green-500div
-                   span className=text-xs font-bold uppercase tracking-widest text-slate-300Instant Manualsspan
-                div
-            div
-         div
-      div
-
-      { Heritage & Brand Story Section }
-      div className=max-w-4xl w-full mt-12 bg-white rounded-[3rem] p-12 shadow-xl border border-slate-100 text-left relative overflow-hidden
-        div className=absolute top-0 right-0 p-10 opacity-[0.02]Quote size={240} div
-        div className=flex items-center gap-6 mb-12 relative z-10
-          div className=p-3 bg-slate-900 rounded-xl text-whiteWrench size={24} div
-          div className=h-10 w-px bg-slate-200div
-          h3 className=text-2xl font-black text-slate-800 uppercase tracking-tighterLematec Heritageh3
-        div
-
-        div className=grid grid-cols-1 lggrid-cols-5 gap-12 items-start relative z-10
-          div className=lgcol-span-3
-            p className=text-slate-500 text-lg leading-relaxed mb-8 font-medium
-              For over three decades, LEMATEC has defined excellence in air tool engineering. Based in Taiwan, we manufacture high-performance solutions designed to withstand the toughest industrial environments.
-            p
-            div className=relative p-8 bg-slate-50 rounded-[2rem] border border-slate-100 shadow-inner
-              Quote className=text-red-60020 absolute top-4 left-4 size={48} 
-              p className=text-slate-800 text-2xl font-black italic leading-tight relative z-10 tracking-tight
-                KEEP PUSHING FORWARD; brBETTER BEATS BEST.
-              p
-            div
-          div
-          
-          div className=lgcol-span-2
-            div className=bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-xl relative
-              div className=flex items-center gap-3 text-red-500 mb-8
-                Users size={20} 
-                span className=text-[10px] font-black uppercase tracking-[0.2em]Leadershipspan
-              div
-              
-              div className=relative z-10
-                h4 className=text-xl font-black uppercase leading-tight mb-2Global Vision, brTaiwan Crafth4
-                p className=text-slate-400 text-xs font-bold mb-10Steering Success; Shaping Solutions.p
-                
-                div className=space-y-8 border-t border-slate-800 pt-8
-                  div className=flex flex-col
-                    span className=text-base font-black italic text-red-500 flex items-center gap-2 uppercase tracking-tight
-                       VIC CHEN Star size={14} fill=currentColor 
-                    span
-                    span className=text-[10px] uppercase text-slate-200 font-black tracking-widest mt-1
-                       General Manager, Taiwan
-                    span
-                  div
-
-                  div className=flex flex-col
-                    span className=text-base font-black italic text-red-500 flex items-center gap-2 uppercase tracking-tight
-                       Charles Rosenstein Star size={14} fill=currentColor 
-                    span
-                    span className=text-[10px] uppercase text-slate-200 font-black tracking-widest mt-1 leading-normal
-                       CEO, Ubiquitous Company br
-                       span className=text-slate-400 italic(Brand Partner)span
-                    span
-                  div
-                div
-              div
-            div
-            
-            a 
-              href={brandStoryUrl} 
-              target=_blank 
-              className=mt-6 flex items-center justify-between w-full p-6 bg-white border-2 border-slate-900 rounded-[2rem] font-black text-slate-900 hoverbg-slate-900 hovertext-white transition-all group no-underline uppercase tracking-tighter
-            
-              spanOur Full Storyspan
-              ChevronRight className=group-hovertranslate-x-2 transition-transform 
-            a
-          div
-        div
-      div
-
-      div className=mt-20 mb-10 text-slate-400 text-[10px] text-center font-black uppercase tracking-[0.3em] leading-relaxed
-        © {new Date().getFullYear()} LEMATEC Co., Ltd. br 
-        Quality Engineered in Taiwan  Professional Air Tools Expert
-      div
-    div
-  );
-};
-
-export default App;
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
